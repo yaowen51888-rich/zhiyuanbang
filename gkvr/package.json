@@ -1,0 +1,12 @@
+{
+  "name": "gkvr",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "uvicorn app.main:app --reload --app-dir backend",
+    "dev:web": "echo \"前端计划补 next dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}

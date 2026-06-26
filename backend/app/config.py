@@ -1,8 +1,10 @@
 """应用配置：数据库连接、CORS、推荐算法阈值。"""
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
     database_url: str = "sqlite:///./gkvr.db"
     allowed_origins: str = "http://localhost:3000"
 

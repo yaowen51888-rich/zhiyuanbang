@@ -1,0 +1,21 @@
+# superpowers 临时文件（brainstorm mockups、sdd ledger）
+.superpowers/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# 数据库
+*.db
+*.sqlite3
+
+# Node
+node_modules/
+.next/
+
+# 原项目数据 dump（大文件，不入 git）
+data/source_sql/*.sql

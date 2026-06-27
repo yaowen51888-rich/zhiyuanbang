@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.errors import BizError
-from app.routers import majors, schools
+from app.routers import majors, score_rank, schools
 
 app = FastAPI(title="gkvr 后端", version="0.1.0")
 
@@ -24,6 +24,7 @@ async def biz_error_handler(request: Request, exc: BizError):
 
 app.include_router(schools.router)
 app.include_router(majors.router)
+app.include_router(score_rank.router)
 
 
 @app.get("/health")

@@ -19,3 +19,6 @@ node_modules/
 
 # 原项目数据 dump（大文件，不入 git）
 data/source_sql/*.sql
+
+# OpenAPI 导出（生成物）
+backend/openapi.json

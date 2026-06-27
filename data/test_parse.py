@@ -3,12 +3,9 @@ import sys
 from pathlib import Path
 
 # 添加项目根目录到 sys.path 以便导入 data 模块
+# （backend 已在 pyproject.toml 的 pythonpath 中，且 import_mysql_to_pg 会自动添加）
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-# 添加 backend 目录到 sys.path 以便导入 app 模块
-backend_path = project_root / "backend"
-sys.path.insert(0, str(backend_path))
 
 from import_mysql_to_pg import parse_sc_li_rows, parse_score_rank_rows, parse_major_score_rows
 

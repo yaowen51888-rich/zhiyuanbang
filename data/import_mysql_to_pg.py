@@ -171,7 +171,7 @@ def parse_major_score_rows(sql_text: str) -> list[dict]:
 
 
 def import_all() -> None:
-    """导入所有数据到 PostgreSQL。"""
+    """导入所有数据到 PostgreSQL（单事务原子性）。"""
     sql_files = sorted(SOURCE_DIR.glob("*.sql"))
     if not sql_files:
         print(f"[skip] {SOURCE_DIR} 下无 .sql 文件，请先放入原项目 dump", file=sys.stderr)
@@ -179,32 +179,29 @@ def import_all() -> None:
 
     text = "\n".join(f.read_text(encoding="utf-8", errors="ignore") for f in sql_files)
 
-    # 导入 school_score
+    # 解析所有表
     sc_rows = parse_sc_li_rows(text)
+    sr_rows = parse_score_rank_rows(text)
+    ms_rows = parse_major_score_rows(text)
+
+    # 单 Session 单 commit 保证原子性
     with Session(engine) as s:
         for r in sc_rows:
             s.add(SchoolScore(**r))
-        s.commit()
-    print(f"[done] 导入 {len(sc_rows)} 条 school_score（四川）")
-
-    # 导入 score_rank
-    sr_rows = parse_score_rank_rows(text)
-    with Session(engine) as s:
         for r in sr_rows:
             s.add(ScoreRank(**r))
-        s.commit()
-    print(f"[done] 导入 {len(sr_rows)} 条 score_rank（四川）")
-
-    # 导入 major_score
-    ms_rows = parse_major_score_rows(text)
-    with Session(engine) as s:
         for r in ms_rows:
             s.add(MajorScore(**r))
         s.commit()
+
+    print(f"[done] 导入 {len(sc_rows)} 条 school_score（四川）")
+    print(f"[done] 导入 {len(sr_rows)} 条 score_rank（四川）")
     print(f"[done] 导入 {len(ms_rows)} 条 major_score（四川）")
 
 
 if __name__ == "__main__":
+    # 注册所有模型到 SQLModel.metadata
+    import app.models  # noqa: F401
     # 仅在真实运行导入时建表
     SQLModel.metadata.create_all(engine)
     import_all()

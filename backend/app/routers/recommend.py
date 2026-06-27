@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 
 from app.config import settings
 from app.db import get_session
-from app.errors import ERR_NO_CANDIDATE, ERR_NO_RANK_DATA
+from app.errors import ERR_NO_CANDIDATE, ERR_NO_RANK_DATA, ERR_SCORE_OUT_OF_RANGE
 from app.models import ScoreRank, SchoolInfo, SchoolScore
 from app.schemas.common import ApiResponse
 from app.schemas.recommend import RecommendItemOut, RecommendRequest
@@ -31,7 +31,6 @@ def recommend_schools(req: RecommendRequest, session: Session = Depends(get_sess
         below = [r for r in year_rows if r.score < req.score]
         exact = max(below, key=lambda r: r.score) if below else None
     if exact is None:
-        from app.errors import ERR_SCORE_OUT_OF_RANGE
         raise ERR_SCORE_OUT_OF_RANGE
     candidate_rank = exact.rank
 

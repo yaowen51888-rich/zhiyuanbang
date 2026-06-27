@@ -2,19 +2,27 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
+from sqlalchemy.pool import StaticPool
 
-# 在导入 main 前替换引擎为内存 SQLite
-test_engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+# 确保所有模型都被注册到 metadata
+from app.models import MajorInfo, Province, SchoolDetail, SchoolInfo, MajorScore, SchoolScore
+
+# 使用共享缓存的内存数据库，确保多个连接访问同一个数据库
+test_engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool)
 
 
 @pytest.fixture(name="session")
 def session_fixture():
-    # 每个测试用全新表，避免数据互相污染
+    # 替换引擎
     import app.db as db  # noqa
     db.engine = test_engine
+
+    # 创建表
     SQLModel.metadata.create_all(test_engine)
+
     with Session(test_engine) as s:
         yield s
+
     SQLModel.metadata.drop_all(test_engine)
 
 

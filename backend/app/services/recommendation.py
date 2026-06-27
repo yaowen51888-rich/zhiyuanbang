@@ -21,7 +21,7 @@ class RecommendItem:
     rank_max: int
 
 
-def classify_tier(candidate_rank: int, admission_rank_mean: int, thresholds: dict) -> Tier | None:
+def classify_tier(candidate_rank: int, admission_rank_mean: int, thresholds: dict[str, float]) -> Tier | None:
     """分档。位次越小排名越靠前；ratio = 考生位次 / 录取位次均值。"""
     if admission_rank_mean <= 0:
         return None
@@ -50,14 +50,21 @@ def estimate_probability(candidate_rank: int, ranks: list[int], k: float) -> flo
 
 
 def recommend(candidate_rank: int, school_history: list[tuple[int, list[int]]],
-              thresholds: dict, prob_k: float) -> list[RecommendItem]:
+              settings) -> list[RecommendItem]:
     """对候选学校逐一分档+估概率，过滤掉不推荐（None）的。"""
+    thresholds = {
+        "pad": settings.tier_pad,
+        "safe": settings.tier_safe,
+        "stable": settings.tier_stable,
+        "rush": settings.tier_rush,
+    }
+    prob_k = settings.prob_k
     items: list[RecommendItem] = []
     for school_id, ranks in school_history:
         if not ranks:
             continue
         mean = sum(ranks) / len(ranks)
-        tier = classify_tier(candidate_rank, int(mean), thresholds)
+        tier = classify_tier(candidate_rank, round(mean), thresholds)
         if tier is None:
             continue
         items.append(RecommendItem(

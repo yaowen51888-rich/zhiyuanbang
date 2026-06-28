@@ -55,7 +55,7 @@ export function Testimonials() {
                 <Quote className="h-5 w-5" />
               </div>
               <p className="mt-6 text-[#16332C] relative z-10 leading-relaxed" style={{ fontSize: "0.9375rem" }}>
-                "{t.quote}"
+                &ldquo;{t.quote}&rdquo;
               </p>
               <div className="mt-6 pt-5 border-t border-[#EEF5F1] relative z-10">
                 <div className="text-[#16332C]" style={{ fontWeight: 600 }}>{t.name}</div>

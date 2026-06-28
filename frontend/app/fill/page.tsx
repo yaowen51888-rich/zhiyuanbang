@@ -1,15 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useWishlistStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import TierBadge from "@/components/TierBadge";
 
+const subscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
+
+function useMounted() {
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
 export default function FillPage() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
 
   const items = useWishlistStore((s) => s.items);
   const remove = useWishlistStore((s) => s.remove);

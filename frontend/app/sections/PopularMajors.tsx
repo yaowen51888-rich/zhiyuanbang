@@ -53,7 +53,7 @@ export function PopularMajors() {
               transition={{ duration: 0.45, delay: i * 0.06 }}
             >
               <Link
-                href={`/majors/${c.slug}`}
+                href={`/majors/category/${c.slug}`}
                 className="group block rounded-2xl bg-white border border-[#E3EDE7] p-5 hover:border-[#C8DDD3] hover:shadow-lg transition-all hover:-translate-y-0.5"
               >
                 <div

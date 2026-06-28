@@ -11,18 +11,18 @@ import type { SchoolOut } from "@/lib/api";
 export default function SchoolCard({ school }: { school: SchoolOut }) {
   return (
     <Link href={`/schools/${school.school_id}`} className="group">
-      <Card className="h-full transition group-hover:border-brand/40 group-hover:shadow-md">
+      <Card className="h-full transition group-hover:border-primary/40 group-hover:shadow-md">
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-base text-brand-dark">
+            <CardTitle className="text-base text-primary">
               {school.name}
             </CardTitle>
             <div className="flex shrink-0 gap-1">
               {school.is_985 && (
-                <Badge className="bg-brand/15 text-brand-dark">985</Badge>
+                <Badge className="bg-primary/15 text-primary">985</Badge>
               )}
               {school.is_211 && (
-                <Badge className="bg-brand/15 text-brand-dark">211</Badge>
+                <Badge className="bg-primary/15 text-primary">211</Badge>
               )}
             </div>
           </div>

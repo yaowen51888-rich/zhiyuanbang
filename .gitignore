@@ -30,3 +30,19 @@ backend/openapi.json
 backend/*.log
 data/crawl_state.json
 docs/*.zip
+
+# 测试与构建产物
+.pytest_cache/
+*.egg-info/
+data/__pycache__/
+frontend/tsconfig.tsbuildinfo
+
+# 数据库与日志（保留脚本，排除运行时产物）
+*.db
+*.sqlite3
+*.log
+
+# 前端构建产物（已在 frontend/.gitignore，根目录再保一次）
+frontend/.next/
+frontend/out/
+frontend/dist/

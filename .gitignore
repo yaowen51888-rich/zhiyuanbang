@@ -22,3 +22,11 @@ data/source_sql/*.sql
 
 # OpenAPI 导出（生成物）
 backend/openapi.json
+
+# 工具产物与运行时状态（不入 git）
+.claude/
+.playwright-mcp/
+.serena/
+backend/*.log
+data/crawl_state.json
+docs/*.zip

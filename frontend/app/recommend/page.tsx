@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -12,13 +13,14 @@ import {
   type SubjectType,
 } from "@/lib/api";
 import {
-  SC_PROVINCE_ID,
+  DEFAULT_PROVINCE_ID,
   PROVINCES,
-  SUBJECT_TYPES,
+  subjectsFor,
   TIER_ORDER,
   TIER_META,
   type Tier,
 } from "@/lib/constants";
+import { ProvinceCombobox } from "@/components/province-combobox";
 
 const tabs: { key: "all" | Tier; label: string }[] = [
   { key: "all", label: "全部" },
@@ -36,11 +38,31 @@ function formatRank(rankMin: number, rankMax: number): string {
   return `位次 ${rankMin.toLocaleString()}–${rankMax.toLocaleString()}`;
 }
 
-export default function RecommendPage() {
-  const [provinceId, setProvinceId] = useState(String(SC_PROVINCE_ID));
-  const [subjectType, setSubjectType] = useState<SubjectType>("science");
-  const [score, setScore] = useState("");
+function RecommendForm() {
+  const sp = useSearchParams();
+  // 首页 Hero 通过 query 传入省份/科类/分数；缺省回退默认江苏
+  const qProv = sp.get("province");
+  const initId = qProv
+    ? PROVINCES.find((p) => p.name === qProv)?.id ?? DEFAULT_PROVINCE_ID
+    : DEFAULT_PROVINCE_ID;
+  const [provinceId, setProvinceId] = useState(String(initId));
+  const currentProvince = PROVINCES.find((p) => p.id === Number(provinceId))!;
+  const subjectOptions = subjectsFor(currentProvince.gaokaoType);
+  const qSubj = sp.get("subject");
+  const initSubject =
+    subjectOptions.find((o) => o.label === qSubj)?.value ?? subjectOptions[0].value;
+  const [subjectType, setSubjectType] = useState<SubjectType>(initSubject as SubjectType);
+  const [score, setScore] = useState(sp.get("score") ?? "");
   const [tab, setTab] = useState<"all" | Tier>("all");
+
+  // 切省份时，若当前科类不在新省份可选科类中，重置为该省默认科类
+  const changeProvince = (id: string) => {
+    setProvinceId(id);
+    const opts = subjectsFor(PROVINCES.find((p) => p.id === Number(id))!.gaokaoType);
+    if (!opts.some((o) => o.value === subjectType)) {
+      setSubjectType(opts[0].value as SubjectType);
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -52,6 +74,16 @@ export default function RecommendPage() {
     onError: (e) =>
       toast.error(e instanceof ApiError ? e.message : "推荐请求失败"),
   });
+
+  // 从首页带分数跳入时，自动触发一次推荐
+  const autoTriggered = useRef(false);
+  useEffect(() => {
+    if (autoTriggered.current) return;
+    autoTriggered.current = true;
+    const sc = Number(score);
+    if (sc > 0 && sc <= 750) mutation.mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const items: RecommendItemOut[] = mutation.data ?? [];
   const byTier = (t: Tier) => items.filter((i) => i.tier === t);
@@ -83,18 +115,14 @@ export default function RecommendPage() {
         </h1>
 
         <form onSubmit={submit} className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-          <label className="px-4 py-3 rounded-xl bg-[#F2F8F5] block">
+          <div className="px-4 py-3 rounded-xl bg-[#F2F8F5] block">
             <div className="text-[10px] tracking-wider text-[#7C8F8A] uppercase">省份</div>
-            <select
+            <ProvinceCombobox
               value={provinceId}
-              onChange={(e) => setProvinceId(e.target.value)}
-              className="w-full bg-transparent outline-none text-[#1F2A2E] mt-0.5"
-            >
-              {PROVINCES.map((p) => (
-                <option key={p.id} value={String(p.id)}>{p.name}</option>
-              ))}
-            </select>
-          </label>
+              onValueChange={changeProvince}
+              className="w-full bg-transparent text-[#1F2A2E] mt-0.5"
+            />
+          </div>
           <label className="px-4 py-3 rounded-xl bg-[#F2F8F5] block">
             <div className="text-[10px] tracking-wider text-[#7C8F8A] uppercase">科类</div>
             <select
@@ -102,7 +130,7 @@ export default function RecommendPage() {
               onChange={(e) => setSubjectType(e.target.value as SubjectType)}
               className="w-full bg-transparent outline-none text-[#1F2A2E] mt-0.5"
             >
-              {SUBJECT_TYPES.map((s) => (
+              {subjectOptions.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
               ))}
             </select>
@@ -212,5 +240,13 @@ export default function RecommendPage() {
         </>
       )}
     </section>
+  );
+}
+
+export default function RecommendPage() {
+  return (
+    <Suspense fallback={null}>
+      <RecommendForm />
+    </Suspense>
   );
 }

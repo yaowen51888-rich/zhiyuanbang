@@ -16,7 +16,7 @@ export function UniversityPreview() {
           <h2 className="mt-3 text-[#16332C]" style={{ fontSize: "2.25rem", fontWeight: 700 }}>
             为你匹配的院校预览
           </h2>
-          <p className="mt-3 text-[#5A6B66]">基于四川 · 理科 · 612 分的示例匹配结果</p>
+          <p className="mt-3 text-[#5A6B66]">基于江苏 · 物理类 · 612 分的示例匹配结果</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {tabs.map((t, i) => (

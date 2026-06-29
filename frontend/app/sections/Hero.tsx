@@ -5,15 +5,26 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { DEFAULT_PROVINCE_ID, PROVINCES, subjectsFor } from "@/lib/constants";
+import { ProvinceCombobox } from "@/components/province-combobox";
 
 export function Hero() {
   const router = useRouter();
-  const [province, setProvince] = useState("四川");
-  const [subject, setSubject] = useState("理科");
+  const [provinceId, setProvinceId] = useState(String(DEFAULT_PROVINCE_ID));
+  const province = PROVINCES.find((p) => p.id === Number(provinceId))!;
+  const subjectOptions = subjectsFor(province.gaokaoType);
+  const [subject, setSubject] = useState(subjectOptions[0].label);
   const [score, setScore] = useState("612");
 
+  // 切省份时，若当前科类不在新省份可选科类中，重置为该省默认科类
+  const changeProvince = (id: string) => {
+    setProvinceId(id);
+    const opts = subjectsFor(PROVINCES.find((p) => p.id === Number(id))!.gaokaoType);
+    if (!opts.some((o) => o.label === subject)) setSubject(opts[0].label);
+  };
+
   const goRecommend = () => {
-    router.push(`/recommend?province=${encodeURIComponent(province)}&subject=${encodeURIComponent(subject)}&score=${score}`);
+    router.push(`/recommend?province=${encodeURIComponent(province.name)}&subject=${encodeURIComponent(subject)}&score=${score}`);
   };
 
   return (
@@ -63,19 +74,14 @@ export function Hero() {
 
           <div className="mt-9 p-2 rounded-2xl bg-white border border-[#E3EDE7] shadow-xl shadow-[#2A9D8F]/5 max-w-xl">
             <div className="grid grid-cols-12 gap-2">
-              <label className="col-span-12 sm:col-span-3 px-3 py-3 rounded-xl bg-[#F2F8F5] block">
+              <div className="col-span-12 sm:col-span-3 px-3 py-3 rounded-xl bg-[#F2F8F5] block">
                 <div className="text-[10px] tracking-wider text-[#7C8F8A] uppercase">省份</div>
-                <select
-                  value={province}
-                  onChange={(e) => setProvince(e.target.value)}
-                  className="w-full bg-transparent outline-none text-[#1F2A2E] mt-0.5"
-                >
-                  <option>四川</option>
-                  <option>北京</option>
-                  <option>广东</option>
-                  <option>江苏</option>
-                </select>
-              </label>
+                <ProvinceCombobox
+                  value={provinceId}
+                  onValueChange={changeProvince}
+                  className="w-full bg-transparent text-[#1F2A2E] mt-0.5"
+                />
+              </div>
               <label className="col-span-12 sm:col-span-3 px-3 py-3 rounded-xl bg-[#F2F8F5] block">
                 <div className="text-[10px] tracking-wider text-[#7C8F8A] uppercase">科类</div>
                 <select
@@ -83,8 +89,9 @@ export function Hero() {
                   onChange={(e) => setSubject(e.target.value)}
                   className="w-full bg-transparent outline-none text-[#1F2A2E] mt-0.5"
                 >
-                  <option>理科</option>
-                  <option>文科</option>
+                  {subjectOptions.map((s) => (
+                    <option key={s.value} value={s.label}>{s.label}</option>
+                  ))}
                 </select>
               </label>
               <label className="col-span-12 sm:col-span-3 px-3 py-3 rounded-xl bg-[#F2F8F5] block">
@@ -124,15 +131,15 @@ export function Hero() {
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-64 rounded-2xl bg-white shadow-2xl shadow-[#2A9D8F]/20 p-5"
           >
-            <Link href="/schools/5" className="block">
+            <Link href="/schools" className="block">
               <div className="flex items-center gap-2 text-xs text-[#7C8F8A]">
                 <GraduationCap className="h-4 w-4 text-[#2A9D8F]" /> 推荐匹配
               </div>
               <div className="mt-2 text-[#1F2A2E]" style={{ fontWeight: 600, fontSize: "1.05rem" }}>
-                西南交通大学
+                南京大学
               </div>
               <div className="mt-1 text-xs text-[#6B7F7A] flex items-center gap-1">
-                <MapPin className="h-3 w-3" /> 成都 · 211 · 理工类
+                <MapPin className="h-3 w-3" /> 南京 · 985 · 综合类
               </div>
               <div className="mt-4 h-2 rounded-full bg-[#EEF5F1] overflow-hidden">
                 <div className="h-full w-[72%] rounded-full bg-gradient-to-r from-[#2A9D8F] to-[#5BB89A]" />

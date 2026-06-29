@@ -21,6 +21,6 @@ export const universities: University[] = [
   { id: "bnu", name: "北京师范大学", location: "北京", rank: "位次 2,810–7,031", prob: 30, tier: "冲", tag: "985" },
   { id: "xidian", name: "西安电子科技大学", location: "西安", rank: "位次 4,314–5,952", prob: 57, tier: "稳", tag: "211" },
   { id: "sufe", name: "上海财经大学", location: "上海", rank: "位次 1,982–8,970", prob: 44, tier: "稳", tag: "211" },
-  { id: "swjtu", name: "西南交通大学", location: "成都", rank: "位次 5,210–7,890", prob: 72, tier: "保", tag: "211" },
-  { id: "scu", name: "四川大学", location: "成都", rank: "位次 4,500–6,200", prob: 65, tier: "稳", tag: "985" },
+  { id: "seu", name: "东南大学", location: "南京", rank: "位次 5,210–7,890", prob: 72, tier: "保", tag: "985" },
+  { id: "nju", name: "南京大学", location: "南京", rank: "位次 4,500–6,200", prob: 65, tier: "稳", tag: "985" },
 ];

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listSchools } from "@/lib/api";
+import { ProvinceCombobox } from "@/components/province-combobox";
 import SchoolCard from "@/components/SchoolCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,9 +28,10 @@ export default async function SchoolsPage({
     typeof sp[k] === "string" ? (sp[k] as string) : undefined;
 
   const page = Math.max(1, Number(get("page") ?? "1"));
+  const province = get("province") || "江苏";
   const data = await listSchools({
     keyword: get("keyword"),
-    province: "四川",
+    province,
     is_985: get("is_985") === "1" ? true : undefined,
     is_211: get("is_211") === "1" ? true : undefined,
     type: get("type"),
@@ -42,6 +44,7 @@ export default async function SchoolsPage({
   // 保留筛选条件，附加分页参数
   const pageHref = (p: number) => {
     const q = new URLSearchParams();
+    q.set("province", province);
     if (get("keyword")) q.set("keyword", get("keyword")!);
     if (get("is_985") === "1") q.set("is_985", "1");
     if (get("is_211") === "1") q.set("is_211", "1");
@@ -52,9 +55,17 @@ export default async function SchoolsPage({
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
-      <h1 className="text-2xl font-extrabold text-primary">学校查询 · 四川</h1>
+      <h1 className="text-2xl font-extrabold text-primary">学校查询 · {province}</h1>
 
       <form className="mt-4 flex flex-wrap items-end gap-3 rounded-2xl bg-card p-4 shadow-sm">
+        <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+          省份
+          <ProvinceCombobox
+            name="province"
+            defaultValue={province}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          />
+        </div>
         <label className="flex flex-col gap-1 text-sm text-muted-foreground">
           关键词
           <Input

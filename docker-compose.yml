@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gkvr
+      POSTGRES_USER: gkvr
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gkvr}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gkvr -d gkvr"]
+      interval: 5s
+      retries: 10
+    # 不映射端口：仅内部网络可达
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://gkvr:${POSTGRES_PASSWORD:-gkvr}@db:5432/gkvr
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+      DATA_RELEASE_URL: ${DATA_RELEASE_URL:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+    environment:
+      # SSR 服务端取数走内部网络名(浏览器侧仍用 build-arg 注入的 localhost)
+      API_BASE_URL_INTERNAL: http://backend:8000
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

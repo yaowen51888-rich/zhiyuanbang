@@ -1,6 +1,11 @@
 import type { components } from "@/types/api";
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+// SSR 在 Next 容器内执行：localhost 指向容器自身(无服务)，必须用内部服务名 backend；
+// 浏览器侧仍用映射到宿主的 NEXT_PUBLIC_API_BASE_URL。
+const BASE =
+  typeof window === "undefined"
+    ? process.env.API_BASE_URL_INTERNAL ?? "http://localhost:8000"
+    : process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
 /** 业务/请求错误，携带后端 code 便于 UI 区分提示（如「分数超范围」1001） */
 export class ApiError extends Error {

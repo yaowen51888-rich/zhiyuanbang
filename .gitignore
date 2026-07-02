@@ -30,6 +30,8 @@ backend/openapi.json
 backend/*.log
 data/crawl_state.json
 docs/*.zip
+bash.exe.stackdump
+docker-compose.override.yml
 
 # 测试与构建产物
 .pytest_cache/
@@ -41,6 +43,10 @@ frontend/tsconfig.tsbuildinfo
 *.db
 *.sqlite3
 *.log
+
+# 全量种子（生成物，发 Release 不入 git；由 export_seed_full.py 产出）
+backend/scripts/seed_full.json
+backend/scripts/seed_full.json.gz
 
 # 前端构建产物（已在 frontend/.gitignore，根目录再保一次）
 frontend/.next/

@@ -3,4 +3,6 @@
 - backend:  https://github.com/electronic-pig/gkvr_system_backend
 Copyright (c) electronic-pig, zf666fz, weeadd
 
+数据：院校基础信息与历年分数线采集自百度高考公开数据（gaokao.baidu.com），均为公开事实数据，仅供学习演示。
+
 MIT License 许可证全文见项目根 LICENSE 或上述仓库。
